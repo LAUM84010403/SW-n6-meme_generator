@@ -12,15 +12,25 @@ spec:
       props:
         justifyContent: start
       children:
-        - component: Autocomplete
-          name: autocomplete
+        - component: PageColumn
+          name: pageColumn
           layout:
-            horizontalAlign: center
-            verticalAlign: start
-          props:
-            fullWidth: true
-            options:
-              $$jsExpression: ""
+            columnSize: 1
+          children:
+            - component: Autocomplete
+              name: autocomplete
+              layout:
+                columnSize: 1
+                horizontalAlign: center
+                verticalAlign: start
+              props:
+                fullWidth: true
+                options:
+                  $$jsExpression: query.rows
+                defaultValue:
+                  $$jsExpression: '"Sélectionnez votre meme"'
+            - component: Image
+              name: image1
         - component: Image
           name: image
   queries:
@@ -31,3 +41,23 @@ spec:
         url: https://api.imgflip.com/get_memes
         headers: []
         method: GET
+        transform: "return data.data.memes\r
+
+          \  .filter(meme => meme.box_count == 2)\r
+
+          \  .slice(0,10)\r
+
+          \  .map(meme => {\r
+
+          \    return {\r
+
+          \      value: meme.id,\r
+
+          \      label: meme.name,\r
+
+          \      url: meme.url\r
+
+          \    }\r
+
+          \  });\r\n"
+        transformEnabled: true
