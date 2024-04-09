@@ -26,11 +26,14 @@ spec:
               props:
                 fullWidth: true
                 options:
-                  $$jsExpression: query.rows
+                  $$jsExpression: query.data
                 defaultValue:
                   $$jsExpression: '"Sélectionnez votre meme"'
             - component: Image
               name: image1
+              props:
+                src:
+                  $$jsExpression: (query.data.find((meme) => meme.value == select.value)).url
         - component: Image
           name: image
   queries:
@@ -61,3 +64,4 @@ spec:
 
           \  });\r\n"
         transformEnabled: true
+        searchParams: []

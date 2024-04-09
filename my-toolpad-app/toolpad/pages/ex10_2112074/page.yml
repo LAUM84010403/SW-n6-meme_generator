@@ -1,0 +1,180 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/mui-toolpad/v0.1.53/docs/schemas/v1/definitions.json#properties/Page
+
+apiVersion: v1
+kind: page
+spec:
+  title: Exercice 10
+  display: shell
+  authorization:
+    allowAll: true
+  displayName: ex10_2112074
+  content:
+    - component: PageRow
+      name: pageRow
+      children:
+        - component: Container
+          name: container
+          children:
+            - component: Text
+              name: text
+              props:
+                value: 1.Choisir une image
+            - component: Select
+              name: select
+              props:
+                options:
+                  $$jsExpression: afficherquerry.data
+                fullWidth: true
+              layout:
+                horizontalAlign: start
+                verticalAlign: start
+            - component: Image
+              name: image
+              props:
+                src:
+                  $$jsExpression:
+                    (afficherquerry.data.find((meme) => meme.value ==
+                    select.value)).url
+            - component: Text
+              name: text1
+              props:
+                value: 2. Rentrez le texte
+            - component: PageRow
+              name: pageRow1
+              props:
+                justifyContent: start
+              children:
+                - component: PageColumn
+                  name: pageColumn
+                  layout:
+                    columnSize: 1
+                  children:
+                    - component: Text
+                      name: markdown
+                      layout:
+                        columnSize: 1
+                      props:
+                        mode: text
+                        value: texte1
+                    - component: Text
+                      name: text2
+                      props:
+                        value: texte2
+                    - component: Text
+                      name: text3
+                      props:
+                        value: génere
+                - component: PageColumn
+                  name: pageColumn1
+                  layout:
+                    columnSize: 1
+                  children:
+                    - component: TextField
+                      name: textField
+                      layout:
+                        columnSize: 1
+                    - component: TextField
+                      name: textField1
+                    - component: Button
+                      name: button
+                      props:
+                        content:
+                          $$jsExpression: "`${action.data.url}`"
+                        onClick:
+                          $$jsExpressionAction: action.call()
+        - component: PageColumn
+          name: pageColumn2
+          layout:
+            columnSize: 1
+          children:
+            - component: Image
+              name: image2
+              layout:
+                columnSize: 1
+              props:
+                src:
+                  $$jsExpression: "`${action.data.data.url}`"
+            - component: Text
+              name: markdown1
+              props:
+                mode: link
+                value: taille réel
+                href:
+                  $$jsExpression: "`${action.data.data.page_url}`"
+      props:
+        justifyContent: start
+  queries:
+    - name: afficherquerry
+      mode: query
+      query:
+        kind: rest
+        url:
+          $$jsExpression: "`https://api.imgflip.com/get_memes`"
+        headers: []
+        method: GET
+        transform: "return data.data.memes\r
+
+          \  .filter(meme => meme.box_count == 2)\r
+
+          \  .slice(0,10)\r
+
+          \  .map(meme => {\r
+
+          \    return {\r
+
+          \      value: meme.id,\r
+
+          \      label: meme.name,\r
+
+          \      url: meme.url\r
+
+          \    }\r
+
+          \  });\r\n"
+        transformEnabled: true
+        searchParams: []
+    - name: action
+      mode: mutation
+      query:
+        kind: rest
+        headers: []
+        body:
+          kind: urlEncoded
+          content:
+            - name: template_id
+              value:
+                $$jsExpression: parameters.template_id
+            - name: username
+              value:
+                $$jsExpression: parameters.username
+            - name: password
+              value:
+                $$jsExpression: parameters.password
+            - name: text0
+              value:
+                $$jsExpression: parameters.text0
+            - name: text1
+              value:
+                $$jsExpression: parameters.text2
+        method: POST
+        url:
+          $$jsExpression: "`https://api.imgflip.com/caption_image`"
+        transform: return data;
+        transformEnabled: true
+        searchParams: []
+      parameters:
+        - name: template_id
+          value:
+            $$jsExpression: select.value
+        - name: username
+          value:
+            $$env: USERNAME
+        - name: password
+          value:
+            $$env: PASSWORD
+        - name: text0
+          value:
+            $$jsExpression: textField.value
+        - name: text2
+          value:
+            $$jsExpression: textField1.value
